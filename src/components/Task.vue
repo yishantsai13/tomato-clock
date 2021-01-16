@@ -1,18 +1,23 @@
 <template>
-  <div class="task">
-    <input
-      type="checkbox"
-      :id="'task_' + id"
-      name="checkbox1"
-      v-model="checked"
-    />
-    <label :for="'task_' + id">
-      <span class="checkbox"></span>
-    </label>
+  <div class="task" :class="taskSize">
+    <temaplate v-if="status === 'undo'">
+      <input
+        type="checkbox"
+        :id="'task_' + id"
+        name="checkbox1"
+        v-model="checked"
+      />
+      <label :for="'task_' + id">
+        <span class="checkbox"></span>
+      </label>
+    </temaplate>
+    <div v-else>
+      <img src="../assets/checked.png" alt="checked" class="checked-icon" />
+    </div>
     <span class="task-text">{{ content }}</span>
     <img
       src="../assets/taskPlay.png"
-      alt=""
+      alt="playtask"
       class="play-icon"
       v-if="isShowPlayIcon"
     />
@@ -35,6 +40,14 @@ export default {
       type: Number,
       required: true,
     },
+    status: {
+      type: String,
+      default: "undo",
+    },
+    size: {
+      type: String,
+      default: "medium",
+    },
   },
   data() {
     return {
@@ -46,6 +59,11 @@ export default {
       if (val) this.$emit("taskDone", this.id);
     },
   },
+  computed: {
+    taskSize() {
+      return `task-${this.size}`;
+    },
+  },
 };
 </script>
 
@@ -53,6 +71,21 @@ export default {
 .task {
   display: flex;
   align-items: center;
+}
+.task-big {
+  .task-text {
+    font-size: 45px;
+  }
+}
+.task-small {
+  .task-text {
+    font-size: 25px;
+  }
+}
+.task-medium {
+  .task-text {
+    font-size: 30px;
+  }
 }
 input[type="checkbox"] {
   display: none;
@@ -66,14 +99,6 @@ input[type="checkbox"] + label .checkbox {
   height: 30px;
   margin-right: 8px;
 }
-// input[type="checkbox"]:checked + label span {
-//   display:inline-block;
-//   // border: 5px solid black;
-//   border-radius: 50%;
-//   width: 30px;
-//   height: 30px;
-//   background:url("./assets/checked.png") no-repeat left top;
-// }
 .check-box {
   display: inline-block;
   border: 5px solid $color-red-dark;
@@ -84,7 +109,6 @@ input[type="checkbox"] + label .checkbox {
 }
 .task-text {
   flex: 1;
-  font-size: 30px;
   font-weight: 500;
 }
 .check-box + span {
@@ -101,5 +125,10 @@ input[type="checkbox"] + label .checkbox {
   width: 35px;
   height: 35px;
   float: right;
+}
+.checked-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
 }
 </style>

@@ -8,6 +8,7 @@
             :content="playedTask.content"
             :isShowPlayIcon="false"
             :id="playedTask.id"
+            :size="'big'"
             @taskDone="doneTask"
           ></Task>
           <div v-else>Wonderful! There's noting to do!</div>
@@ -28,8 +29,9 @@
             class="task-input"
             placeholder="Add A New Mission"
             v-model="addTaskContent"
+            @keyup.enter="addTask"
           />
-          <button class="task-input-button" @click="addTask" v-on:keyup.enter="addTask">
+          <button class="task-input-button" @click="addTask">
             <img src="./assets/plus.png" alt="plusBtn" />
           </button>
         </div>
@@ -44,6 +46,9 @@
           :content="task.content"
           :key="task.id"
           :id="task.id"
+          :isShowPlayIcon="false"
+          :status="task.status"
+          :size="'small'"
         ></Task>
       </div>
     </div>
@@ -116,14 +121,15 @@ export default {
         this.playedTask = this.unDoTaskList.length ? this.unDoTaskList[0] : {};
     },
     addTask() {
-      console.log('huiiii enter click')
-      if(!this.addTaskContent) return
+      console.log("huiiii enter click");
+      if (!this.addTaskContent) return;
       this.taskList.push({
         content: this.addTaskContent,
-        status: 'undo',
-        time: 0
-      })
-      this.addTaskContent = ''
+        status: "undo",
+        time: 0,
+        id: ++this.count,
+      });
+      this.addTaskContent = "";
     },
   },
   mounted() {
@@ -173,7 +179,7 @@ body {
   padding: 10px 40px;
   display: flex;
   align-items: center;
-  font-size: 30px;
+  font-size: 45px;
 }
 .chat-bubble-tail {
   height: 50px;
@@ -206,12 +212,14 @@ body {
 }
 
 .task-input-block {
-  margin-top: 40px;
   border: 3px solid $color-red-dark;
   border-radius: 5px;
   background: #ffffff 0% 0% no-repeat padding-box;
   height: 70px;
   display: flex;
+  .task + & {
+    margin-top: 40px;
+  }
 }
 .task-input,
 .task-input:focus,
@@ -239,6 +247,9 @@ body {
   background-color: $color-background-white;
   border-radius: 3px;
   padding: 15px 30px;
+  .task {
+    color: $color-gray;
+  }
 }
 .task-complete-header {
   color: $color-gray;
@@ -251,27 +262,10 @@ body {
   margin-left: auto;
   float: right;
 }
-.task-complete-list .task {
-  .checked-icon {
-    display: inline-block;
-    background: url("./assets/checked.png") no-repeat left top;
-    width: 30px;
-    height: 30px;
-    background-size: contain;
-    margin-right: 8px;
-    vertical-align: sub;
-  }
-  .task-text {
-    font-size: 25px;
-    color: $color-gray;
-  }
-}
-
 .time-counter-line {
   border: 5px solid #ffffff;
   margin: 40px 10px;
 }
-
 .action-block {
   position: relative;
   justify-content: center;
