@@ -1,37 +1,60 @@
 <template>
-  <div class="tomato">
+  <div class="tomato" :class="tomatoClass">
     <div class="tomato-body">
       <div class="tomato-eye tomato-eye-left"></div>
       <div class="tomato-eye tomato-eye-right"></div>
       <!-- <div class="tomato-smile"></div> -->
-      <img src="../assets/smile.png" alt="" class="tomato-smile">
-      <div class="time">25:00</div>
+      <img src="../assets/smile.png" alt="" class="tomato-smile" />
+      <div class="time">{{ showTime }}</div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Tomato',
-  props:{
-    tiem:{
+  name: "Tomato",
+  props: {
+    time: {
+      type: Number,
+      defalut: 1500000,
+    },
+    status: {
       type: String,
     },
-    status:{
-      type: String,
+  },
+  computed: {
+    showTime() {
+      let minute = parseInt(this.time / 60000);
+      let second = parseInt((this.time % 60000) / 1000);
+      console.log(minute, second);
+      if (minute < 10) minute = "0" + minute;
+      if (second < 10) second = "0" + second;
+      return `${minute}:${second}`;
+    },
+    tomatoClass(){
+      let status = this.status === 'coolDown' ? 'cool-down' : this.status
+      return `tomato-${status}`
     }
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">
 $tomato-height: 600px;
 $tomato-width: 800px;
+.tomato{
+  &.tomato-processing .tomato-body{
+    background-color: $color-orange;
+  }
+  &.tomato-cool-down .tomato-body{
+    background-color: $color-light-green;
+  }
+}
 
 .tomato-body {
   height: $tomato-height;
   width: $tomato-width;
-  background:$color-red;
+  background: $color-red;
   box-shadow: 0px 3px 6px #00000029;
   opacity: 1;
   border-radius: 60%;
@@ -42,7 +65,7 @@ $tomato-width: 800px;
   content: "";
   width: 70px;
   height: 135px;
-  background:$color-grean;
+  background: $color-grean;
   opacity: 1;
   border-radius: 90%;
   position: absolute;
@@ -92,9 +115,9 @@ $tomato-width: 800px;
   left: 50%;
   transform: translate(-50%, -50%);
 }
-.time{
+.time {
   font-size: 172px;
-  color: #FFFFFF;
+  color: #ffffff;
   position: absolute;
   left: 50%;
   top: 60%;

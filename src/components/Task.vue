@@ -1,6 +1,6 @@
 <template>
   <div class="task" :class="taskSize">
-    <temaplate v-if="status === 'undo'">
+    <div v-if="status === 'undo'">
       <input
         type="checkbox"
         :id="'task_' + id"
@@ -10,7 +10,7 @@
       <label :for="'task_' + id">
         <span class="checkbox"></span>
       </label>
-    </temaplate>
+    </div>
     <div v-else>
       <img src="../assets/checked.png" alt="checked" class="checked-icon" />
     </div>
@@ -20,6 +20,7 @@
       alt="playtask"
       class="play-icon"
       v-if="isShowPlayIcon"
+      @click="playTask"
     />
   </div>
 </template>
@@ -63,6 +64,11 @@ export default {
     taskSize() {
       return `task-${this.size}`;
     },
+  },
+  methods: {
+    playTask(){
+      this.$emit("playTask", this.id)
+    }
   },
 };
 </script>

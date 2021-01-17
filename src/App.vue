@@ -22,6 +22,7 @@
           :key="task.id"
           :id="task.id"
           @taskDone="doneTask"
+          @playTask="playTask"
         ></Task>
         <div class="task-input-block">
           <input
@@ -53,11 +54,12 @@
       </div>
     </div>
     <div class="right">
-      <tomato></tomato>
+      <tomato :time="tomatoTime" :status="tomatoStatus"></tomato>
       <div class="time-counter-line"></div>
       <div class="action-block">
-        <div class="play-button"></div>
-        <div class="cancel-button"></div>
+        <div v-if="!countId" class="play-button" @click="startCountDown"></div>
+        <div v-else class="stop-button" @click="stopCountDown"></div>
+        <div class="cancel-button" @click="clearCountDown"></div>
       </div>
     </div>
   </div>
@@ -66,22 +68,30 @@
 <script>
 import Tomato from "./components/Tomato.vue";
 import Task from "./components/Task.vue";
+
+const startTime = 1500000 //25mins
+const coolDownTime = 300000 //5mins
+// const startTime = 2000; //25mins
+// const coolDownTime = 2000; //5mins
 const taskList = [
   {
     content: "Do exercise",
-    time: 0,
+    time: startTime,
+    coolDownTime: coolDownTime,
     status: "undo",
     id: 0,
   },
   {
     content: "Have dinner",
-    time: 0,
+    time: startTime,
     status: "undo",
+    coolDownTime: coolDownTime,
     id: 1,
   },
   {
     content: "Read document",
-    time: 0,
+    time: startTime,
+    coolDownTime: coolDownTime,
     status: "done",
     id: 2,
   },
@@ -98,6 +108,7 @@ export default {
       count: 2,
       playedTask: {},
       addTaskContent: "",
+      countId: "",
     };
   },
   computed: {
@@ -113,6 +124,22 @@ export default {
     doneTaskList() {
       return this.taskList.filter((item) => item.status === "done");
     },
+    tomatoStatus() {
+      return this.playedTask.time === startTime || !this.hasPlayedTask
+        ? "normal"
+        : this.playedTask.time === 0
+        ? "coolDown"
+        : "processing";
+    },
+    isCoolDown() {
+      return this.tomatoStatus === "coolDown";
+    },
+    tomatoTime() {
+      if (!this.hasPlayedTask) return 0;
+      return this.isCoolDown
+        ? this.playedTask.coolDownTime
+        : this.playedTask.time;
+    },
   },
   methods: {
     doneTask(id) {
@@ -126,10 +153,68 @@ export default {
       this.taskList.push({
         content: this.addTaskContent,
         status: "undo",
-        time: 0,
+        time: startTime,
         id: ++this.count,
+        coolDownTime: coolDownTime,
       });
       this.addTaskContent = "";
+    },
+    startCountDown() {
+      if(!this.hasPlayedTask) return
+      let remainSecond = this.tomatoTime;
+      let _self = this;
+      let countDown = setInterval(function () {
+        remainSecond = remainSecond - 1000;
+        _self.isCoolDown
+          ? (_self.playedTask.coolDownTime = remainSecond)
+          : (_self.playedTask.time = remainSecond);
+
+        if (remainSecond < 1000) {
+          if (_self.isCoolDown && _self.playedTask.coolDownTime !== 0)
+            return (remainSecond = _self.playedTask.coolDownTime);
+          clearInterval(countDown);
+          _self.countId = "";
+          _self.playedTask.status = "done";
+          _self.playedTask = _self.unDoTaskList.length
+            ? _self.unDoTaskList[0]
+            : {};
+          return;
+        }
+      }, 1000);
+      this.countId = countDown;
+      // let remainSecond = this.playedTask.time
+      // let _self = this
+      // let countDown = setInterval(function () {
+      //   remainSecond = remainSecond - 1000
+      //   _self.playedTask.time = remainSecond
+      //   console.log(_self.playedTask.time)
+
+      //   if (remainSecond < 1000) {
+      //     console.log('hiiii')
+      //     // mission.status = 'success'
+      //     clearInterval(countDown)
+      //     _self.countId = ''
+      //     // this.stopCountDown(countDown)
+      //     _self.playedTask.status = 'done'
+      //     console.log(_self.unDoTaskList[0])
+      //     _self.playedTask = _self.unDoTaskList.length ? _self.unDoTaskList[0] : {}
+      //     return;
+      //   }
+      // }, 1000);
+      // this.countId = countDown
+    },
+    stopCountDown() {
+      clearInterval(this.countId);
+      this.countId = "";
+    },
+    clearCountDown() {
+      if(!this.hasPlayedTask) return
+      this.stopCountDown();
+      this.playedTask.time = startTime;
+    },
+    playTask(id) {
+      this.stopCountDown();
+      this.playedTask = this.taskList.find((item) => item.id === id);
     },
   },
   mounted() {
@@ -276,6 +361,16 @@ body {
   width: 100px;
   height: 100px;
   background: url("./assets/play.png");
+  background-size: contain;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.stop-button {
+  width: 100px;
+  height: 100px;
+  background: url("./assets/stop.png");
   background-size: contain;
   position: absolute;
   left: 50%;
