@@ -1,5 +1,7 @@
 # tomato_clock
 
+[demo](https://yishantsai13.github.io/tomato-clock/)
+
 ## Project setup
 ```
 yarn install
