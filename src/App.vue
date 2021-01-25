@@ -55,7 +55,9 @@
     </div>
     <div class="right">
       <tomato :time="tomatoTime" :status="tomatoStatus"></tomato>
-      <div class="time-counter-line"></div>
+      <div class="time-counter-line">
+        <div class="time-couter-line-active" :style="{width: countDownWidth+'%','background-color':timeCounterColor}"></div>
+      </div>
       <div class="action-block">
         <div v-if="!countId" class="play-button" @click="startCountDown"></div>
         <div v-else class="stop-button" @click="stopCountDown"></div>
@@ -140,6 +142,22 @@ export default {
         ? this.playedTask.coolDownTime
         : this.playedTask.time;
     },
+    countDownWidth(){
+      return (this.isCoolDown ? this.tomatoTime/startTime : this.tomatoTime/startTime) * 100
+    },
+    timeCounterColor(){
+      switch(this.tomatoStatus){
+        case 'normal':
+          return '#FFFFFF'
+          break
+        case 'coolDown':
+          return '#858C51'
+          break
+        case 'processing':
+          return '#F2AA6B'
+          break
+      }
+    }
   },
   methods: {
     doneTask(id) {
@@ -348,8 +366,14 @@ body {
   float: right;
 }
 .time-counter-line {
-  border: 5px solid #ffffff;
+  height: 10px;
+  background-color: #ffffff;
   margin: 40px 10px;
+}
+.time-couter-line-active{
+  z-index: 100;
+  height: 10px;
+  background-color: #858C51;
 }
 .action-block {
   position: relative;
